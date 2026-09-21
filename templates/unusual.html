@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Unusual Transactions</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="app-container">
+
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="mobile-menu-header">
+
+            <div class="sidebar-logo">
+
+                <h2>Smart Expense</h2>
+
+                <p>Intelligence</p>
+
+            </div>
+
+
+            <button class="menu-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="/dashboard" class="nav-item">
+
+                🏠
+
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <a href="/prediction" class="nav-item">
+
+                🤖
+
+                <span>Prediction & Insights</span>
+
+            </a>
+
+
+            <a href="/history" class="nav-item">
+
+                📅
+
+                <span>History</span>
+
+            </a>
+
+
+            <a href="/transactions" class="nav-item">
+
+                💳
+
+                <span>Recent Transactions</span>
+
+            </a>
+
+
+            <a href="/unusual" class="nav-item active">
+
+                ⚠️
+
+                <span>Unusual Transactions</span>
+
+            </a>
+
+
+            <!-- CORRECTED ADD EXPENSE LINK -->
+
+            <a href="/add-expense" class="nav-item add-nav-item">
+
+                ➕
+
+                <span>Add Expense</span>
+
+            </a>
+
+
+            <div class="sidebar-divider"></div>
+
+
+            <a href="/logout" class="nav-item logout-nav-item">
+
+                🚪
+
+                <span>Logout</span>
+
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content">
+
+
+        <!-- Page Header -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>Unusual Transactions</h1>
+
+                <p>
+                    Review expenses identified as unusual by the
+                    anomaly detection system.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= UNUSUAL TRANSACTIONS ================= -->
+
+        <div class="dashboard-card">
+
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>⚠️ Unusual Expenses</h2>
+
+                    <p>
+                        Transactions identified as unusual.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            {% if transactions %}
+
+
+                <div class="transaction-list">
+
+
+                    {% for transaction in transactions %}
+
+
+                        <div class="transaction">
+
+
+                            <div>
+
+                                <strong>
+                                    {{ transaction.description }}
+                                </strong>
+
+
+                                <p>
+
+                                    {{ transaction.date }}
+
+                                    {% if transaction.category %}
+
+                                        • {{ transaction.category }}
+
+                                    {% endif %}
+
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    ₹{{ "%.2f"|format(transaction.amount) }}
+                                </strong>
+
+
+                                <p>
+                                    ⚠️ Unusual
+                                </p>
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="placeholder">
+
+                    <h3>
+                        No unusual transactions
+                    </h3>
+
+                    <p>
+                        No unusual spending has been detected yet.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- ================= MOBILE MENU ================= -->
+
+<script>
+
+function toggleMenu() {
+
+    const menu = document.querySelector(".sidebar-nav");
+
+    menu.classList.toggle("show");
+
+}
+
+</script>
+
+
+</body>
+
+</html>
+

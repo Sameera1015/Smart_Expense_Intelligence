@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard - Smart Expense Intelligence</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+
+</head>
+
+<body>
+
+<div class="app-container">
+
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+    <div class="mobile-menu-header">
+
+        <div class="sidebar-logo">
+
+            <h2>Smart Expense</h2>
+
+            <p>Intelligence</p>
+
+        </div>
+
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            ☰
+        </button>
+
+    </div>
+
+
+    <nav class="sidebar-nav">
+
+        <a href="/dashboard" class="nav-item active">
+
+            🏠
+
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <a href="/prediction" class="nav-item">
+
+            🤖
+
+            <span>Prediction & Insights</span>
+
+        </a>
+
+
+        <a href="/history" class="nav-item">
+
+            📅
+
+            <span>History</span>
+
+        </a>
+
+
+        <a href="/transactions" class="nav-item">
+
+            💳
+
+            <span>Recent Transactions</span>
+
+        </a>
+
+
+        <a href="/unusual" class="nav-item">
+
+            ⚠️
+
+            <span>Unusual Transactions</span>
+
+        </a>
+
+
+        <a href="/add-expense" class="nav-item add-nav-item">
+
+            ➕
+
+            <span>Add Expense</span>
+
+        </a>
+
+
+        <div class="sidebar-divider"></div>
+
+
+        <a href="/logout" class="nav-item logout-nav-item">
+
+            🚪
+
+            <span>Logout</span>
+
+        </a>
+
+    </nav>
+
+</aside>
+
+
+
+<!-- ================= MAIN CONTENT ================= -->
+
+<main class="main-content">
+
+
+    <!-- Dashboard Header -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Dashboard</h1>
+
+            <p>
+                Understand your spending and manage your expenses.
+            </p>
+
+        </div>
+
+
+        <div class="dashboard-header-actions">
+
+
+            <a href="/add-expense" class="add-expense-btn">
+
+                + Add Expense
+
+            </a>
+
+
+            <div class="profile-menu">
+
+
+                <button
+                    class="profile-button"
+                    onclick="toggleProfileMenu()"
+                >
+
+                    👤
+
+                </button>
+
+
+                <div
+                    class="profile-dropdown"
+                    id="profileDropdown"
+                >
+
+                    <p class="profile-username">
+
+                        👤 {{ username }}
+
+                    </p>
+
+
+                    <a href="/logout">
+
+                        Logout
+
+                    </a>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= SUMMARY CARDS ================= -->
+
+    <section class="summary-cards">
+
+
+        <!-- Total Spending -->
+
+        <div class="summary-card">
+
+            <h3>Total Spending</h3>
+
+            <p>
+
+                ₹{{ "%.2f"|format(total_spending) }}
+
+            </p>
+
+        </div>
+
+
+
+        <!-- This Month -->
+
+        <div class="summary-card">
+
+            <h3>This Month</h3>
+
+            <p>
+
+                ₹{{ "%.2f"|format(this_month) }}
+
+            </p>
+
+        </div>
+
+
+
+        <!-- Last Month -->
+
+        <div class="summary-card">
+
+            <h3>Last Month</h3>
+
+
+            {% if last_month_spending is not none %}
+
+                <p>
+
+                    ₹{{ "%.2f"|format(last_month_spending) }}
+
+                </p>
+
+            {% else %}
+
+                <p class="not-available">
+
+                    Not available
+
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- Predicted Next Month -->
+
+        <div class="summary-card">
+
+            <h3>Predicted Next Month</h3>
+
+
+            {% if predicted_next_month is not none %}
+
+                <p>
+
+                    ₹{{ "%.2f"|format(predicted_next_month) }}
+
+                </p>
+
+            {% else %}
+
+                <p class="not-available">
+
+                    Not available
+
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ================= GRAPHS ================= -->
+
+    <section class="dashboard-grid">
+
+
+        <!-- ================= TRANSACTION AMOUNTS ================= -->
+
+        <div class="dashboard-card">
+
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>Transaction Amounts</h2>
+
+                    <p>
+
+                        See the amount of each recent expense.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-container">
+
+
+                {% if recent_transactions %}
+
+                    <canvas id="transactionChart"></canvas>
+
+                {% else %}
+
+                    <div class="placeholder">
+
+                        No transactions recorded yet.
+
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ================= CATEGORY DISTRIBUTION ================= -->
+
+        <div class="dashboard-card">
+
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>Spending by Category</h2>
+
+                    <p>
+
+                        See where your money is being spent.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-container">
+
+
+                {% if category_spending %}
+
+                    <canvas id="categoryChart"></canvas>
+
+                {% else %}
+
+                    <div class="placeholder">
+
+                        No category data available yet.
+
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ================= QUICK INSIGHT ================= -->
+
+    <section class="dashboard-card">
+
+
+        <div class="card-header">
+
+            <div>
+
+                <h2>Quick Insight</h2>
+
+                <p>
+
+                    Your current spending activity.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="insight-box">
+
+
+            <p>
+
+                {{ spending_insight }}
+
+            </p>
+
+
+
+            {% if last_month_spending is not none
+                  and last_month_spending > 0 %}
+
+                <p>
+
+                    Change from last month:
+
+                    <strong>
+
+                        ₹{{ "%.2f"|format(spending_change) }}
+
+                    </strong>
+
+                    ({{ "%.1f"|format(spending_change_percentage) }}%)
+
+                </p>
+
+            {% endif %}
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+</div>
+
+<!-- ================= CHART.JS ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+
+    /* =====================================================
+       TRANSACTION DATA
+       ===================================================== */
+
+
+    const transactionLabels = [
+
+        {% for item in recent_transactions %}
+
+            "{{ item['description'] }}"
+
+            {% if not loop.last %},{% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+
+    const transactionValues = [
+
+        {% for item in recent_transactions %}
+
+            {{ item['amount'] }}
+
+            {% if not loop.last %},{% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+
+    /* =====================================================
+       CATEGORY DATA
+       ===================================================== */
+
+
+    const categoryLabels = [
+
+        {% for item in category_spending %}
+
+            "{{ item['category'] }}"
+
+            {% if not loop.last %},{% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+
+    const categoryValues = [
+
+        {% for item in category_spending %}
+
+            {{ item['total'] }}
+
+            {% if not loop.last %},{% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+
+    /* =====================================================
+       TRANSACTION AMOUNT BAR CHART
+       ===================================================== */
+
+
+    const transactionCanvas =
+        document.getElementById("transactionChart");
+
+
+    if (transactionCanvas) {
+
+        new Chart(transactionCanvas, {
+
+            type: "bar",
+
+            data: {
+
+                labels: transactionLabels,
+
+                datasets: [{
+
+                    label: "Expense Amount",
+
+                    data: transactionValues
+
+                }]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            callback: function(value) {
+
+                                return "₹" + value;
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+
+    /* =====================================================
+       CATEGORY DONUT CHART
+       ===================================================== */
+
+
+    const categoryCanvas =
+        document.getElementById("categoryChart");
+
+
+    if (categoryCanvas) {
+
+        new Chart(categoryCanvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: categoryLabels,
+
+                datasets: [{
+
+                    data: categoryValues
+
+                }]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "65%",
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom"
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+
+    /* =====================================================
+       MOBILE MENU
+       ===================================================== */
+
+
+    function toggleMenu() {
+
+        const menu =
+            document.querySelector(".sidebar-nav");
+
+        menu.classList.toggle("show");
+
+    }
+
+
+
+    /* =====================================================
+       PROFILE MENU
+       ===================================================== */
+
+
+    let profileTimer;
+
+
+    function toggleProfileMenu() {
+
+        const dropdown =
+            document.getElementById("profileDropdown");
+
+
+        dropdown.classList.toggle("show");
+
+
+        clearTimeout(profileTimer);
+
+
+        if (dropdown.classList.contains("show")) {
+
+            profileTimer = setTimeout(function() {
+
+                dropdown.classList.remove("show");
+
+            }, 3000);
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       CLOSE PROFILE MENU WHEN CLICKING OUTSIDE
+       ===================================================== */
+
+
+    document.addEventListener("click", function(event) {
+
+        const profileMenu =
+            document.querySelector(".profile-menu");
+
+
+        const dropdown =
+            document.getElementById("profileDropdown");
+
+
+        if (
+            !profileMenu.contains(event.target) &&
+            dropdown.classList.contains("show")
+        ) {
+
+            dropdown.classList.remove("show");
+
+            clearTimeout(profileTimer);
+
+        }
+
+    });
+
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Spending History</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="app-container">
+
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="mobile-menu-header">
+
+            <div class="sidebar-logo">
+
+                <h2>Smart Expense</h2>
+
+                <p>Intelligence</p>
+
+            </div>
+
+            <button class="menu-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="/dashboard" class="nav-item">
+                🏠
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/prediction" class="nav-item">
+                🤖
+                <span>Prediction & Insights</span>
+            </a>
+
+            <a href="/history" class="nav-item active">
+                📅
+                <span>History</span>
+            </a>
+
+            <a href="/transactions" class="nav-item">
+                💳
+                <span>Recent Transactions</span>
+            </a>
+
+            <a href="/unusual" class="nav-item">
+                ⚠️
+                <span>Unusual Transactions</span>
+            </a>
+
+            <!-- CORRECTED ADD EXPENSE LINK -->
+            <a href="/add-expense" class="nav-item add-nav-item">
+                ➕
+                <span>Add Expense</span>
+            </a>
+
+            <div class="sidebar-divider"></div>
+
+            <a href="/logout" class="nav-item logout-nav-item">
+                🚪
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content">
+
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>Spending History</h1>
+
+                <p>
+                    View your spending month by month.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= MONTHLY SPENDING ================= -->
+
+        <div class="dashboard-card history-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>📅 Monthly Spending</h2>
+
+                    <p>
+                        Select a month to view its transactions.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            {% if monthly_data %}
+
+
+                <div class="monthly-list">
+
+
+                    {% for row in monthly_data %}
+
+
+                        <a href="/history/{{ row.month }}"
+                           class="monthly-item">
+
+
+                            <div class="monthly-info">
+
+                                <h3>
+
+                                    {% set month_number = row.month[5:7] %}
+
+                                    {% if month_number == "01" %}
+                                        January
+                                    {% elif month_number == "02" %}
+                                        February
+                                    {% elif month_number == "03" %}
+                                        March
+                                    {% elif month_number == "04" %}
+                                        April
+                                    {% elif month_number == "05" %}
+                                        May
+                                    {% elif month_number == "06" %}
+                                        June
+                                    {% elif month_number == "07" %}
+                                        July
+                                    {% elif month_number == "08" %}
+                                        August
+                                    {% elif month_number == "09" %}
+                                        September
+                                    {% elif month_number == "10" %}
+                                        October
+                                    {% elif month_number == "11" %}
+                                        November
+                                    {% elif month_number == "12" %}
+                                        December
+                                    {% endif %}
+
+                                    {{ row.month[:4] }}
+
+                                </h3>
+
+
+                                <p>
+                                    {{ row.transaction_count }}
+                                    transactions
+                                </p>
+
+                            </div>
+
+
+
+                            <div class="monthly-right">
+
+                                <strong>
+                                    ₹{{ "%.2f"|format(row.total_spending) }}
+                                </strong>
+
+                                <span class="monthly-arrow">
+                                    →
+                                </span>
+
+                            </div>
+
+
+                        </a>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="placeholder">
+
+                    <h3>
+                        No spending history yet
+                    </h3>
+
+                    <p>
+                        Add expenses to start building your
+                        spending history.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- ================= MOBILE MENU ================= -->
+
+<script>
+
+function toggleMenu() {
+
+    const menu = document.querySelector(".sidebar-nav");
+
+    menu.classList.toggle("show");
+
+}
+
+</script>
+
+
+</body>
+
+</html>

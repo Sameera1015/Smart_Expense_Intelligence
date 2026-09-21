@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Recent Transactions</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+    /* ================= REMOVE CONFIRMATION POPUP ================= */
+
+    .confirm-overlay {
+
+        display: none;
+
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        background: rgba(0, 0, 0, 0.45);
+
+        justify-content: center;
+        align-items: center;
+
+        z-index: 9999;
+
+    }
+
+
+    .confirm-box {
+
+        background: white;
+
+        width: 90%;
+        max-width: 400px;
+
+        padding: 28px;
+
+        border-radius: 14px;
+
+        text-align: center;
+
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+
+        animation: popupAppear 0.2s ease-out;
+
+    }
+
+
+    .confirm-icon {
+
+        font-size: 42px;
+
+        margin-bottom: 10px;
+
+    }
+
+
+    .confirm-box h2 {
+
+        margin-bottom: 8px;
+
+    }
+
+
+    .confirm-box p {
+
+        color: #666;
+
+        margin-bottom: 24px;
+
+    }
+
+
+    .confirm-buttons {
+
+        display: flex;
+
+        justify-content: center;
+
+        gap: 12px;
+
+    }
+
+
+    .confirm-cancel,
+    .confirm-remove {
+
+        border: none;
+
+        padding: 10px 20px;
+
+        border-radius: 7px;
+
+        cursor: pointer;
+
+        font-size: 14px;
+
+    }
+
+
+    .confirm-cancel {
+
+        background: #e5e7eb;
+
+        color: #333;
+
+    }
+
+
+    .confirm-remove {
+
+        background: #dc2626;
+
+        color: white;
+
+    }
+
+
+    .confirm-cancel:hover {
+
+        background: #d1d5db;
+
+    }
+
+
+    .confirm-remove:hover {
+
+        background: #b91c1c;
+
+    }
+
+
+    @keyframes popupAppear {
+
+        from {
+
+            transform: scale(0.9);
+
+            opacity: 0;
+
+        }
+
+        to {
+
+            transform: scale(1);
+
+            opacity: 1;
+
+        }
+
+    }
+
+</style>
+
+
+</head>
+
+<body>
+
+<div class="app-container">
+
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+    <div class="mobile-menu-header">
+
+        <div class="sidebar-logo">
+
+            <h2>Smart Expense</h2>
+
+            <p>Intelligence</p>
+
+        </div>
+
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            ☰
+        </button>
+
+    </div>
+
+
+    <nav class="sidebar-nav">
+
+        <a href="/dashboard" class="nav-item">
+
+            🏠
+
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <a href="/prediction" class="nav-item">
+
+            🤖
+
+            <span>Prediction & Insights</span>
+
+        </a>
+
+
+        <a href="/history" class="nav-item">
+
+            📅
+
+            <span>History</span>
+
+        </a>
+
+
+        <a href="/transactions" class="nav-item active">
+
+            💳
+
+            <span>Recent Transactions</span>
+
+        </a>
+
+
+        <a href="/unusual" class="nav-item">
+
+            ⚠️
+
+            <span>Unusual Transactions</span>
+
+        </a>
+
+
+        <a href="/add-expense" class="nav-item add-nav-item">
+
+            ➕
+
+            <span>Add Expense</span>
+
+        </a>
+
+
+        <div class="sidebar-divider"></div>
+
+
+        <a href="/logout" class="nav-item logout-nav-item">
+
+            🚪
+
+            <span>Logout</span>
+
+        </a>
+
+    </nav>
+
+</aside>
+
+
+
+<!-- ================= MAIN CONTENT ================= -->
+
+<main class="main-content">
+
+
+    <!-- ================= PAGE HEADER ================= -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Recent Transactions</h1>
+
+            <p>
+                View your recorded expenses.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= TRANSACTIONS ================= -->
+
+    <div class="dashboard-card">
+
+
+        <div class="card-header">
+
+            <div>
+
+                <h2>💳 All Transactions</h2>
+
+                <p>
+                    View all your recorded expenses.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        {% if transactions %}
+
+
+            <div class="transaction-list">
+
+
+                {% for transaction in transactions %}
+
+
+                    <div class="transaction">
+
+
+                        <!-- TRANSACTION INFORMATION -->
+
+                        <div>
+
+                            <strong>
+                                {{ transaction.description }}
+                            </strong>
+
+
+                            <p>
+
+                                {{ transaction.date }}
+
+                                {% if transaction.category %}
+
+                                    • {{ transaction.category }}
+
+                                {% endif %}
+
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- AMOUNT + STATUS + REMOVE -->
+
+                        <div style="text-align: right;">
+
+
+                            <strong>
+                                ₹{{ "%.2f"|format(transaction.amount) }}
+                            </strong>
+
+
+                            {% if transaction.anomaly_status == "Unusual" %}
+
+                                <p>
+                                    ⚠️ Unusual
+                                </p>
+
+                            {% endif %}
+
+
+
+                            <!-- REMOVE EXPENSE -->
+
+                            <form
+                                action="/remove-expense/{{ transaction.id }}"
+                                method="POST"
+                                onsubmit="openConfirmPopup(event, this)"
+                                style="margin-top: 8px;"
+                            >
+
+                                <button
+                                    type="submit"
+                                    style="
+                                        background: #dc2626;
+                                        color: white;
+                                        border: none;
+                                        padding: 7px 12px;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-size: 13px;
+                                    "
+                                >
+                                    🗑️ Remove
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        {% else %}
+
+
+            <div class="placeholder">
+
+                <h3>
+                    No transactions yet
+                </h3>
+
+                <p>
+                    Add an expense to see your transactions here.
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</main>
+
+
+</div>
+
+<!-- ================= CUSTOM CONFIRMATION POPUP ================= -->
+
+<div
+    class="confirm-overlay"
+    id="confirmOverlay"
+>
+
+
+<div class="confirm-box">
+
+    <div class="confirm-icon">
+        ⚠️
+    </div>
+
+
+    <h2>
+        Remove Expense?
+    </h2>
+
+
+    <p>
+        Are you sure you want to remove this expense?
+    </p>
+
+
+    <div class="confirm-buttons">
+
+        <button
+            type="button"
+            class="confirm-cancel"
+            onclick="closeConfirmPopup()"
+        >
+            Cancel
+        </button>
+
+
+        <button
+            type="button"
+            class="confirm-remove"
+            onclick="confirmRemove()"
+        >
+            Remove
+        </button>
+
+    </div>
+
+</div>
+
+
+</div>
+
+<!-- ================= MOBILE MENU ================= -->
+
+<script>
+
+let selectedForm = null;
+
+
+function openConfirmPopup(event, form) {
+
+    event.preventDefault();
+
+    selectedForm = form;
+
+    document.getElementById("confirmOverlay").style.display = "flex";
+
+}
+
+
+function closeConfirmPopup() {
+
+    document.getElementById("confirmOverlay").style.display = "none";
+
+    selectedForm = null;
+
+}
+
+
+function confirmRemove() {
+
+    if (selectedForm) {
+
+        selectedForm.submit();
+
+    }
+
+}
+
+
+function toggleMenu() {
+
+    const menu = document.querySelector(".sidebar-nav");
+
+    menu.classList.toggle("show");
+
+}
+
+
+document.getElementById("confirmOverlay").addEventListener(
+    "click",
+    function(event) {
+
+        if (event.target === this) {
+
+            closeConfirmPopup();
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
