@@ -53,7 +53,8 @@ db_pool = ConnectionPool(
     max_size=5,
     kwargs={
         "row_factory": dict_row
-    }
+    },
+    check=ConnectionPool.check_connection
 )
 
 
