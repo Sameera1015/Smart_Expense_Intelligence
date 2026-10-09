@@ -208,9 +208,9 @@ python app.py
 Open your browser and navigate to:
 ```text
 http://127.0.0.1:5000
+```
 
-
-
+---
 
 ## Model Evaluation
 
@@ -254,7 +254,7 @@ http://127.0.0.1:5000
 - **Log-Scale Transformation for Isolation Forest:**
   $$\text{Amount\_Log} = \log(1 + \text{Amount})$$
 
-
+---
 
 ## Important Notes
 - Predicted spending is an estimation tool for planning, not a guaranteed financial outcome.
@@ -263,7 +263,7 @@ http://127.0.0.1:5000
 - Model performance metrics reflect evaluation on the Kaggle Personal Finance benchmark dataset.
 - Keep database credentials and secrets secure outside version control.
 
-
+---
 
 ## Future Scope
 - **Personalized Budgeting Insights**: Dynamic smart-saving advice based on recurring habits.
@@ -274,7 +274,7 @@ http://127.0.0.1:5000
 - **Continuous / Online Retraining**: Automated pipeline to fine-tune models on user feedback.
 - **Interactive Financial Visualizations**: Advanced charts using Plotly or Chart.js.
 
-
+---
 
 ## License
 This project was developed as an academic machine-learning project for personal expense intelligence and financial analytics.
